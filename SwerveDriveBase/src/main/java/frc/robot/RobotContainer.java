@@ -4,60 +4,91 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveTestCommand;
+import frc.robot.commands.TeleopDrive;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.SwerveModuleConfig;
+import frc.robot.subsystems.OI;
+import frc.robot.subsystems.SwerveModule;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  private final OI m_OI = new OI();
+  private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
+  
+  /**
+   * Robot container constructor
+   * Set default commands, adds options to the auto chooser.
+   */
   public RobotContainer() {
-    // Configure the trigger bindings
+    CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
+   
     configureBindings();
+    //
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
+  // Initialize Preferences For Subsystem Classes:
+  public static void initPreferences() {
+    System.out.println("RobotContainer: init Preferences.");
+    SwerveModuleConfig.initPreferences();
+    DriveSubsystem.initPreferences();
+    OI.initPreferences();
+    SwerveModule.initPreferences();
+  }
+
+  public void diagnostics() {
+    // TODO insert diagnostics routines
+    boolean allGood = false;
+
+    
+    String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
+    String oiDiagnostics = m_OI.getDiagnostics();
+
+
+    SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
+    SmartDashboard.putString("Diag/OI", oiDiagnostics);
+
+  }
+
+  // called when robot initializes. Sets parking brake to false
+  public void teleopInit() {
+    m_driveSubsystem.parkingBrake(false);
+    // m_arm.initializeShoulder();
+  }
+
+  public void disableInit() {
+  }
+
+  // Configures the button mappings for controllers
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    System.out.println("RobotContainer: configure Bindings");
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
+    }
+
+   
+
+  // Trigger updateMotorEncodersTrigger = new Trigger(m_OI ::
+  // getOperatorLeftTriggerButton);
+  // updateMotorEncodersTrigger.onTrue(updateMotorEncoders());
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * Sets test mode
    */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+  public void setTestMode() {
+    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);
+    dtc.schedule();
+    System.out.println("Robot Container: Test mode set");
+  }
+
+
+  /**
+   * Sets the bling and underglow of the Robot on startup. Underglow to the color
+   * of the alliance.
+   * bling to green if shoulder angle initializes correctly and red if it doesn't.
+   */
+  public void setStartupLighting() {
   }
 }
