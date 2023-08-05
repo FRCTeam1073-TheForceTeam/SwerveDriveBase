@@ -5,8 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.motorcontrol.Faults;
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.Pigeon2_Faults;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
@@ -253,7 +251,6 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
-    double heading = getHeading();
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
@@ -271,7 +268,6 @@ public class DriveSubsystem extends SubsystemBase
   {
     // return odometry position as a pose 3d
     Pose2d odo = getOdometry();
-    //TODO: use internal roll and pitch methods later
     return new Pose3d(odo.getX(), odo.getY(), 0.0, new Rotation3d(pigeon2.getRoll(), pigeon2.getPitch(), getHeading()));
   }
   

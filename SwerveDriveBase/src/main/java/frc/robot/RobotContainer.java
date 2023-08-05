@@ -40,9 +40,6 @@ public class RobotContainer {
   }
 
   public void diagnostics() {
-    // TODO insert diagnostics routines
-    boolean allGood = false;
-
     
     String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
     String oiDiagnostics = m_OI.getDiagnostics();
@@ -56,7 +53,6 @@ public class RobotContainer {
   // called when robot initializes. Sets parking brake to false
   public void teleopInit() {
     m_driveSubsystem.parkingBrake(false);
-    // m_arm.initializeShoulder();
   }
 
   public void disableInit() {
@@ -67,12 +63,6 @@ public class RobotContainer {
     System.out.println("RobotContainer: configure Bindings");
 
     }
-
-   
-
-  // Trigger updateMotorEncodersTrigger = new Trigger(m_OI ::
-  // getOperatorLeftTriggerButton);
-  // updateMotorEncodersTrigger.onTrue(updateMotorEncoders());
 
   /**
    * Sets test mode

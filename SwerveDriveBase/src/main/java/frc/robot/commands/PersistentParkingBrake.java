@@ -31,7 +31,6 @@ public class PersistentParkingBrake extends CommandBase
         {
             
         }
-        //isParkingBrakeOn = true;
     }
 
     @Override

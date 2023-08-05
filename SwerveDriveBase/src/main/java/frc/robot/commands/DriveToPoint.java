@@ -88,7 +88,6 @@ public class DriveToPoint extends CommandBase {
     drivetrain.setBrakes(true);
   }
 
-  // Returns true when the command should end.
   // Returns true when robot position is within the tolerance
   @Override
   public boolean isFinished() {
