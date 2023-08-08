@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI extends SubsystemBase
 {
@@ -204,11 +201,7 @@ public class OI extends SubsystemBase
         return driverController.getRawAxis(2);
     }
 
-    // public double getOperatorLeftTrigger(){
-    //     return operatorController.getRawAxis(2);
-    // }
-
-        /**
+    /**
      * @return The Value of the driver controller's left bumper
      * @param input - The current value of the input stream.
      * @return The debounced value of the input stream.     
@@ -217,7 +210,8 @@ public class OI extends SubsystemBase
     {
         return parkingBrakeDebouncer.calculate(driverController.getRawButton(5));
     }
-     /**
+
+    /**
      * @return The Value of the driver controller's menu button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -228,7 +222,7 @@ public class OI extends SubsystemBase
     }
     
 
-     /**
+    /**
      * @return The Value of the driver controller's 2 square button
      * @param button - The button index, beginning at 1.
      * @return Whether the button was pressed since the last check.
@@ -238,7 +232,7 @@ public class OI extends SubsystemBase
         return fieldCentricDebouncer.calculate(driverController.getRawButton(7));
     }
     
-     /**
+    /**
      * @return The Value of the driver controller's menu button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -248,7 +242,7 @@ public class OI extends SubsystemBase
         return menuDriverButtonDebouncer.calculate(driverController.getRawButton(8));
     }
     
-     /**
+    /**
      * @return The Value of the driver controller's X button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -258,7 +252,7 @@ public class OI extends SubsystemBase
         return xDriverButtonDebouncer.calculate(driverController.getRawButton(3));
     }
 
-     /**
+    /**
      * @return The Value of the driver controller's A button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -268,7 +262,7 @@ public class OI extends SubsystemBase
         return aDriverButtonDebouncer.calculate(driverController.getRawButton(1));
     }
 
-     /**
+    /**
      * @return The Value of the driver controller's Y button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -278,7 +272,7 @@ public class OI extends SubsystemBase
         return yDriverButtonDebouncer.calculate(driverController.getRawButton(4));
     }
 
-     /**
+    /**
      * @return The Value of the driver controller's B button
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
@@ -288,7 +282,7 @@ public class OI extends SubsystemBase
         return bDriverButtonDebouncer.calculate(driverController.getRawButton(2));
     }
 
-     /**
+    /**
      * @return The Value of the driver controller's DPad button
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
@@ -479,9 +473,4 @@ public class OI extends SubsystemBase
         return "";
     }
 
-    // public void setRumble(double val){
-    //     operatorController.setRumble(RumbleType.kLeftRumble, val);
-    //     operatorController.setRumble(RumbleType.kRightRumble, val);
-    // }
-    
 }

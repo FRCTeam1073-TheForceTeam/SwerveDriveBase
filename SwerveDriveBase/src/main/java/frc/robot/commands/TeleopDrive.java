@@ -5,23 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 
-//import javax.lang.model.util.ElementScanner14;
-
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
 
@@ -49,9 +40,6 @@ public class TeleopDrive extends CommandBase
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
-  //Snap to position thresholds
-  private final static double STOP_THRESHOLD = 20;
-  private final static double SLOW_THRESHOLD = 30;
 
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi){
@@ -97,60 +85,6 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftX) < .05) {leftX = 0;}
     if(Math.abs(rightX) < .15) {rightX = 0;}
 
-    /* 
-    double velVector = Math.sqrt(Math.pow(leftY, 2) + Math.pow(leftX, 2));
-    double tempY = leftY;
-    double tempX = leftX;
-    if(velVector > 1){
-      if(leftY > 0){
-        leftY = Math.sqrt(1 - Math.pow(tempX, 2));
-      }
-      else{
-        leftY = -Math.sqrt(1 - Math.pow(tempX, 2));
-      }
-      if(leftX > 0){
-        leftX = Math.sqrt(1 - Math.pow(tempY, 2));
-      }
-      else{
-        leftX = -Math.sqrt(1 - Math.pow(tempX, 2));
-      }
-    }
-    */
-
-    double xAdd = 0;
-    double yAdd = 0;
-    double wAdd = 0;
-/* 
-    if(leftY > 0){
-      xAdd = add1 + add2;
-    }
-    else if(leftY < 0){
-      xAdd = -add1 + -add2;
-    }
-    else{
-      xAdd = 0;
-    }
-
-    if(leftX > 0){
-      yAdd = add1 + add2;
-    }
-    else if(leftX < 0){
-      yAdd = -add1 + -add2;
-    }
-    else{
-      yAdd = 0;
-    }
-
-    if(rightX > 0){
-      wAdd = -add1 + -add2;
-    }
-    else if(rightX < 0){
-      wAdd = add1 + add2;
-    }
-    else{
-      wAdd = 0;
-    }
-*/
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle() && lastRobotCentricButton == false){
       fieldCentric = !fieldCentric;
@@ -169,14 +103,6 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.parkingBrake(false);
     }
     else if (fieldCentric){
-      //Snap to cardinal directions
-      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
-      //desiredAngle += rightX;
-      //rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), desiredAngle);
-
-      //double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      //double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (rightX > 0 ? -add2 : add2)), -maximumRotationVelocity, maximumRotationVelocity);
 
       double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
       double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 ) * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
@@ -218,14 +144,6 @@ public class TeleopDrive extends CommandBase
     while(error < -180){error += 360;}
     while(error > 180){error -= 360;}
     SmartDashboard.putNumber("Angle Error", error);
-    //if(Math.abs(error) < STOP_THRESHOLD){
-    //  return 0;
-    //}
-
-    //snapPidProfile.setTolerance(STOP_THRESHOLD);
-    //snapPidProfile.enableContinuousInput(-180, 180);
-    //return MathUtil.clamp(snapPidProfile.calculate(currentAngle, targetAngle), -1.0, 1.0);
-    //calculate derivative
     
     error = error * Math.PI / 180;
     double new_error = error;
