@@ -4,9 +4,10 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.sensors.Pigeon2_Faults;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -29,8 +30,8 @@ public class DriveSubsystem extends SubsystemBase
   private SwerveModule[] modules;
   private ChassisSpeeds chassisSpeeds;
   private boolean debug = false;
-  private WPI_Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
+  private Pigeon2 pigeon2;
   private double maximumLinearSpeed = 1.0;
   private double[] rates = new double[3];
   private boolean parkingBrakeOn = false;
@@ -38,9 +39,9 @@ public class DriveSubsystem extends SubsystemBase
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
   {
-    pigeon2 = new WPI_Pigeon2(13);
-    var error = pigeon2.configFactoryDefault();
-    if (error != ErrorCode.OK) 
+    pigeon2 = new Pigeon2(13);
+    var error = pigeon2.getConfigurator().apply(new Pigeon2Configuration());
+    if (error != StatusCode.OK) 
     {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
     }
@@ -136,13 +137,13 @@ public class DriveSubsystem extends SubsystemBase
     result += modules[2].getDiagnostics();
     result += modules[3].getDiagnostics();
 
-    Pigeon2_Faults faults = new Pigeon2_Faults();
-    pigeon2.getFaults(faults);
-    if(faults.hasAnyFault()){
-      result += faults.toString();
-    }
-    ErrorCode error = pigeon2.clearStickyFaults(500);
-    if (error != ErrorCode.OK) {
+    //Pigeon2_Faults faults = new Pigeon2_Faults();
+    // pigeon2.getFaults(faults);
+    // if(faults.hasAnyFault()){
+    //   result += faults.toString();
+    // }
+    StatusCode error = pigeon2.clearStickyFaults(500);
+    if (error != StatusCode.OK) {
         result += String.format(" Cannot contact the pigeon.");
     }
     
@@ -158,7 +159,7 @@ public class DriveSubsystem extends SubsystemBase
   //Returns IMU heading in degrees
   public double getHeading() 
   {
-    return pigeon2.getYaw();
+    return pigeon2.getAngle();
   }
 
   // Wraps the heading
@@ -179,23 +180,23 @@ public class DriveSubsystem extends SubsystemBase
 
   public double getPitch()
   {
-    return pigeon2.getPitch();
+    return pigeon2.getPitch().getValue();
   }
 
   public double getRoll()
   {
-    return pigeon2.getRoll();
+    return pigeon2.getRoll().getValue();
   }
 
   public double getPitchRate()
   {
-    pigeon2.getRawGyro(rates);
-    return rates[1];
+    return pigeon2.getAccelerationY().getValue();
   }
 
   // Reset IMU heading to zero degrees
   public void zeroHeading() 
   {
+    //TODO:Change value to whatever value you need it to be
     pigeon2.setYaw(180);
   }
 
@@ -251,6 +252,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
+    double heading = getHeading();
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
@@ -268,7 +270,8 @@ public class DriveSubsystem extends SubsystemBase
   {
     // return odometry position as a pose 3d
     Pose2d odo = getOdometry();
-    return new Pose3d(odo.getX(), odo.getY(), 0.0, new Rotation3d(pigeon2.getRoll(), pigeon2.getPitch(), getHeading()));
+    //TODO: use internal roll and pitch methods later
+    return new Pose3d(odo.getX(), odo.getY(), 0.0, new Rotation3d(getRoll(), getPitch(), getHeading()));
   }
   
   @Override
@@ -289,14 +292,14 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
 
-      SmartDashboard.putNumber("Actual Module speed", modules[0].getDriveVelocity());
-      SmartDashboard.putNumber("Actual Module angle", modules[0].getSteeringAngle());
+      SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
+      SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());
       SmartDashboard.putNumber("Commanded Speed", states[0].speedMetersPerSecond);
       SmartDashboard.putNumber("Commanded angle", states[0].angle.getRadians());
     }
     else if(!parkingBrakeOn)
     { //in debug mode
-      SmartDashboard.putNumber("Module 0 Velocity in ticks", modules[0].getDriveRawVelocity());
+      SmartDashboard.putNumber("Module 0 Velocity in Rotations per Second", modules[0].getDriveRawVelocity());
     }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
