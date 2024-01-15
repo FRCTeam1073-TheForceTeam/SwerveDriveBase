@@ -29,7 +29,7 @@ public class DriveSubsystem extends SubsystemBase
   private SwerveDriveOdometry odometry;
   private SwerveModule[] modules;
   private ChassisSpeeds chassisSpeeds;
-  private boolean debug = false;
+  private boolean debug = true;
   private SwerveModulePosition[] modulePositions;
   private Pigeon2 pigeon2;
   private double maximumLinearSpeed = 1.0;
@@ -277,6 +277,7 @@ public class DriveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+
     if (!debug && !parkingBrakeOn) //disables motors when parking brakes are active
     {
       // This method will be called once per scheduler run
@@ -300,6 +301,8 @@ public class DriveSubsystem extends SubsystemBase
     else if(!parkingBrakeOn)
     { //in debug mode
       SmartDashboard.putNumber("Module 0 Velocity in Rotations per Second", modules[0].getDriveRawVelocity());
+
+      setDebugSpeed(SmartDashboard.getNumber("Debug Speed", 0.0));
     }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());

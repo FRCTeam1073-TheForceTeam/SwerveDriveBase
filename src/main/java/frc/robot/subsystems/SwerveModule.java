@@ -171,7 +171,10 @@ public class SwerveModule
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
         //TODO: cvt driveVelocity to units specified above
         // TODO:Check ^^
-        driveMotor.setControl(new VelocityDutyCycle(-driveVelocity * (cfg.metersPerRotation / 10)));
+        //var error = driveMotor.setControl(new VelocityDutyCycle((-driveVelocity * cfg.metersPerRotation) / 10));
+        VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
+        var error = driveMotor.setControl(velocityDutyCycle.withVelocity((-driveVelocity * cfg.metersPerRotation) / 10));
+        System.err.println(error.getDescription());
     }
 
     //setSteerAngle in radians
