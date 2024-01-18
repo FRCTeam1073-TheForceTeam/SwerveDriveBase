@@ -10,7 +10,9 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -40,6 +42,8 @@ public class SwerveModule
     // private SwerveModuleIDConfig ids;
     private CANcoder steerEncoder;
     public Translation2d position;
+    public VelocityVoltage driveVelocityVoltage;
+    public PositionVoltage steerPositionVoltage;
     
     /** Constructs a swerve module class. Initializes drive and steer motors
      * 
@@ -55,6 +59,8 @@ public class SwerveModule
         steerMotor = new TalonFX(ids.steerMotorID);
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANcoder(ids.steerEncoderID);
+        driveVelocityVoltage = new VelocityVoltage(0);
+        steerPositionVoltage = new PositionVoltage(0);
         setUpMotors();
     }
 
@@ -172,9 +178,11 @@ public class SwerveModule
         //TODO: cvt driveVelocity to units specified above
         // TODO:Check ^^
         //var error = driveMotor.setControl(new VelocityDutyCycle((-driveVelocity * cfg.metersPerRotation) / 10));
-        VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
-        var error = driveMotor.setControl(velocityDutyCycle.withVelocity((-driveVelocity * cfg.metersPerRotation) / 10));
-        System.err.println(error.getDescription());
+        // VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
+        // var error = driveMotor.setControl(velocityDutyCycle.withVelocity((-driveVelocity * cfg.metersPerRotation) / 10));
+        driveMotor.setControl(driveVelocityVoltage.withVelocity((-driveVelocity / cfg.metersPerRotation)));
+        SmartDashboard.putNumber("commanded Drive velocity", (-driveVelocity / cfg.metersPerRotation));
+        //System.out.println(error.getDescription());
     }
 
     //setSteerAngle in radians
@@ -183,7 +191,7 @@ public class SwerveModule
         //TODO: fix steering angle units and add offset
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
-        steerMotor.setControl(new PositionDutyCycle((steeringAngle +  cfg.steerAngleOffset) / (Math.PI * 2.0)));
+        steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) / (Math.PI * 2.0)));
     }
 
     /**Sets motors in the module to brake or coast mode
@@ -262,18 +270,23 @@ public class SwerveModule
         steerMotorClosedLoopConfig.kD = cfg.steerD;
         steerMotorClosedLoopConfig.kV = cfg.steerF;
         
-        steerMotor.getConfigurator(). apply(steerMotorClosedLoopConfig, 0.05);
+        steerMotor.getConfigurator().apply(steerMotorClosedLoopConfig, 0.05);
 
         
         // PID Loop settings for drive velocity control:
         var driveMotorClosedLoopConfig = new Slot0Configs();
 
-        driveMotorClosedLoopConfig.kP = cfg.driveP;
-        driveMotorClosedLoopConfig.kI = cfg.driveI;
-        driveMotorClosedLoopConfig.kD = cfg.driveD;
-        driveMotorClosedLoopConfig.kV = cfg.driveF;
+        // driveMotorClosedLoopConfig.kP = cfg.driveP;
+        // driveMotorClosedLoopConfig.kI = cfg.driveI;
+        // driveMotorClosedLoopConfig.kD = cfg.driveD;
+        // driveMotorClosedLoopConfig.kV = cfg.driveF;
+        driveMotorClosedLoopConfig.withKP(cfg.driveP);
+        driveMotorClosedLoopConfig.withKI(cfg.driveI);
+        driveMotorClosedLoopConfig.withKD(cfg.driveD);
+        driveMotorClosedLoopConfig.withKV(cfg.driveF);
 
-        driveMotor.getConfigurator(). apply(driveMotorClosedLoopConfig, 0.05);
+        var driveError = driveMotor.getConfigurator().apply(driveMotorClosedLoopConfig, 0.05);
+        System.out.println(driveError);
 
     }
 

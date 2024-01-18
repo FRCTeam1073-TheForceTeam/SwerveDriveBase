@@ -91,17 +91,7 @@ public class OI extends SubsystemBase
         RIGHT_Y_ZERO = getDriverRightY();
     }
 
-    public boolean isCubeMode() {
-        return isCubeMode;
-    }
-
-    public void setCubeMode(){
-        isCubeMode = true;
-    }
     
-    public void setConeMode(){
-        isCubeMode = false;
-    }
 
     private final double LEFT_X_MIN = -1;
     private final double LEFT_X_MAX = 1;

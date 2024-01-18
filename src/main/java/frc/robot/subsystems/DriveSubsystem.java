@@ -29,7 +29,7 @@ public class DriveSubsystem extends SubsystemBase
   private SwerveDriveOdometry odometry;
   private SwerveModule[] modules;
   private ChassisSpeeds chassisSpeeds;
-  private boolean debug = true;
+  private boolean debug = false;
   private SwerveModulePosition[] modulePositions;
   private Pigeon2 pigeon2;
   private double maximumLinearSpeed = 1.0;
@@ -115,6 +115,7 @@ public class DriveSubsystem extends SubsystemBase
 
     // Configure maximum linear speed for limiting:
     maximumLinearSpeed = Preferences.getDouble("Drive.MaximumLinearSpeed", 3.5);
+    SmartDashboard.putNumber("Debug Power", 0.0);
     // Initial chassis speeds are zero:
     chassisSpeeds = new ChassisSpeeds(0,0,0);
   }
@@ -283,10 +284,10 @@ public class DriveSubsystem extends SubsystemBase
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
-      states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = optimizeB(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+      states[0] = optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
+      states[1] = optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
+      states[2] = optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
+      states[3] = optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
@@ -298,11 +299,11 @@ public class DriveSubsystem extends SubsystemBase
       SmartDashboard.putNumber("Commanded Speed", states[0].speedMetersPerSecond);
       SmartDashboard.putNumber("Commanded angle", states[0].angle.getRadians());
     }
-    else if(!parkingBrakeOn)
+    if(debug)
     { //in debug mode
       SmartDashboard.putNumber("Module 0 Velocity in Rotations per Second", modules[0].getDriveRawVelocity());
 
-      setDebugSpeed(SmartDashboard.getNumber("Debug Speed", 0.0));
+      setDebugDrivePower(SmartDashboard.getNumber("Debug Power", 0.0));
     }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
@@ -323,10 +324,10 @@ public class DriveSubsystem extends SubsystemBase
     if (parkingBrakeOn)
     {
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
-      states[0] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[3].getSteeringAngle()));
+      states[0] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[0].getSteeringAngle()));
+      states[1] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[1].getSteeringAngle()));
+      states[2] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[2].getSteeringAngle()));
+      states[3] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[3].getSteeringAngle()));
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
@@ -361,14 +362,14 @@ public class DriveSubsystem extends SubsystemBase
   public void setDebugDrivePower(double power) // sets the power directly
   {
     modules[0].setDebugTranslate(power);
-    modules[1].setDebugTranslate(power);
-    modules[2].setDebugTranslate(power);
-    modules[3].setDebugTranslate(power);
+    // modules[1].setDebugTranslate(power);
+    // modules[2].setDebugTranslate(power);
+    // modules[3].setDebugTranslate(power);
   }
 
 
   // optimizes the module states to take the shortest path to the desired position
-  public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle)
+  public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle)
   {
     double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
     double targetSpeed = desiredState.speedMetersPerSecond;
