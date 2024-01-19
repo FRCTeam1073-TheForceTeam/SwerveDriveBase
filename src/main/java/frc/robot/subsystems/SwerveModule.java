@@ -191,7 +191,8 @@ public class SwerveModule
         //TODO: fix steering angle units and add offset
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
-        steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) / (Math.PI * 2.0)));
+        steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
+        //SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
     /**Sets motors in the module to brake or coast mode
@@ -265,10 +266,10 @@ public class SwerveModule
         // PID Loop settings for steering position control:
         var steerMotorClosedLoopConfig = new Slot0Configs();
 
-        steerMotorClosedLoopConfig.kP = cfg.steerP;
-        steerMotorClosedLoopConfig.kI = cfg.steerI;
-        steerMotorClosedLoopConfig.kD = cfg.steerD;
-        steerMotorClosedLoopConfig.kV = cfg.steerF;
+        steerMotorClosedLoopConfig.withKP(cfg.steerP);
+        steerMotorClosedLoopConfig.withKI(cfg.steerI);
+        steerMotorClosedLoopConfig.withKD(cfg.steerD);
+        steerMotorClosedLoopConfig.withKV(cfg.steerF);
         
         steerMotor.getConfigurator().apply(steerMotorClosedLoopConfig, 0.05);
 

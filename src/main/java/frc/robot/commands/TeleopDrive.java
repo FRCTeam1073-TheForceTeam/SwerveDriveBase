@@ -81,8 +81,8 @@ public class TeleopDrive extends Command
     double leftX = m_OI.getDriverLeftX();
     double rightX = m_OI.getDriverRightX();
     //sets deadzones on the controller to extend to .05:
-    if(Math.abs(leftY) < .05) {leftY = 0;}
-    if(Math.abs(leftX) < .05) {leftX = 0;}
+    if(Math.abs(leftY) < .15) {leftY = 0;}
+    if(Math.abs(leftX) < .15) {leftX = 0;}
     if(Math.abs(rightX) < .15) {rightX = 0;}
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug

@@ -15,6 +15,7 @@ public class SwerveModuleConfig
     public Translation2d position = new Translation2d(0,0);
     //public double tickPerMeter = 1000;
     public double metersPerRotation = (0.1016 * Math.PI) / 6.75;
+    public double radiansPerRotation = (150 / 7) / (Math.PI * 2);
     //public double tickPerRadian = 1000;
     public double steerAngleOffset = 0;
     public double steerCurrentLimit = 20;
