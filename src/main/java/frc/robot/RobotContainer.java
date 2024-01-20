@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.DriveTestCommand;
+import frc.robot.commands.TeleopDebugDrive;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -18,6 +19,7 @@ public class RobotContainer {
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
+  private final TeleopDebugDrive m_TeleopDebugDrive = new TeleopDebugDrive(m_driveSubsystem, m_OI);
   
   /**
    * Robot container constructor

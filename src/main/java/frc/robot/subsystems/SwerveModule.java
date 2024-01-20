@@ -99,7 +99,7 @@ public class SwerveModule
     public double getSteeringAngle()
     {
         // TODO:Check 
-        return (steerEncoder.getPosition().getValue() * (Math.PI * (2.0))) - (cfg.steerAngleOffset / (Math.PI * 2.0));
+        return (steerEncoder.getPosition().getValue() * (Math.PI * (2.0))) - cfg.steerAngleOffset;
     }
 
     // Return drive encoder in meters.
@@ -113,7 +113,7 @@ public class SwerveModule
     public double getDriveVelocity(){ 
         // TODO: Find out meters per second
         // TODO:Check ^^
-        return -driveMotor.getRotorVelocity().getValue() * (cfg.metersPerRotation / 10);
+        return -driveMotor.getRotorVelocity().getValue() / (cfg.metersPerRotation );
     }
 
     // Returns the velocity from the motor itself in rotations
@@ -180,8 +180,8 @@ public class SwerveModule
         //var error = driveMotor.setControl(new VelocityDutyCycle((-driveVelocity * cfg.metersPerRotation) / 10));
         // VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
         // var error = driveMotor.setControl(velocityDutyCycle.withVelocity((-driveVelocity * cfg.metersPerRotation) / 10));
-        driveMotor.setControl(driveVelocityVoltage.withVelocity((-driveVelocity / cfg.metersPerRotation)));
-        SmartDashboard.putNumber("commanded Drive velocity", (-driveVelocity / cfg.metersPerRotation));
+        driveMotor.setControl(driveVelocityVoltage.withVelocity((-driveVelocity * cfg.metersPerRotation)));
+        SmartDashboard.putNumber("commanded Drive velocity", (-driveVelocity * cfg.metersPerRotation));
         //System.out.println(error.getDescription());
     }
 
@@ -192,7 +192,7 @@ public class SwerveModule
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
         steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
-        //SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
+        SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
     /**Sets motors in the module to brake or coast mode

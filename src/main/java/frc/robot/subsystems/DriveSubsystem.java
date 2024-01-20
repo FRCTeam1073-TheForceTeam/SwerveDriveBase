@@ -349,22 +349,22 @@ public class DriveSubsystem extends SubsystemBase
     modules[3].setDriveVelocity(speed);
   }
 
-  public void setDebugAngle(double angle) // sets the angle directly
+  public void setDebugAngle(double power) // sets the angle directly
   {
-    SmartDashboard.putNumber("Debug Angle", angle);
+    //SmartDashboard.putNumber("Debug Angle", angle);
 
-    modules[0].setSteerAngle(angle);
-    modules[1].setSteerAngle(angle);
-    modules[2].setSteerAngle(angle);
-    modules[3].setSteerAngle(angle);
+    modules[0].setDebugRotate(power);
+    modules[1].setDebugRotate(power);
+    modules[2].setDebugRotate(power);
+    modules[3].setDebugRotate(power);
   }
 
   public void setDebugDrivePower(double power) // sets the power directly
   {
     modules[0].setDebugTranslate(power);
-    // modules[1].setDebugTranslate(power);
-    // modules[2].setDebugTranslate(power);
-    // modules[3].setDebugTranslate(power);
+    modules[1].setDebugTranslate(power);
+    modules[2].setDebugTranslate(power);
+    modules[3].setDebugTranslate(power);
   }
 
 
