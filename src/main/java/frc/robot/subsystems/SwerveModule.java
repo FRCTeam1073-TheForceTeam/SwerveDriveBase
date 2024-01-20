@@ -43,7 +43,7 @@ public class SwerveModule
     private CANcoder steerEncoder;
     public Translation2d position;
     public VelocityVoltage driveVelocityVoltage;
-    public PositionVoltage steerPositionVoltage;
+    public PositionDutyCycle steerPositionVoltage;
     
     /** Constructs a swerve module class. Initializes drive and steer motors
      * 
@@ -60,7 +60,7 @@ public class SwerveModule
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANcoder(ids.steerEncoderID);
         driveVelocityVoltage = new VelocityVoltage(0);
-        steerPositionVoltage = new PositionVoltage(0);
+        steerPositionVoltage = new PositionDutyCycle(0);
         setUpMotors();
     }
 
