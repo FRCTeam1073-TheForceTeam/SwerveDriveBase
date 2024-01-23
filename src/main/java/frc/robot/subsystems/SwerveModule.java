@@ -14,7 +14,6 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.*;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -43,7 +42,7 @@ public class SwerveModule
     private CANcoder steerEncoder;
     public Translation2d position;
     public VelocityVoltage driveVelocityVoltage;
-    public PositionDutyCycle steerPositionVoltage;
+    public PositionDutyCycle steerPositionDutyCycle;
     
     /** Constructs a swerve module class. Initializes drive and steer motors
      * 
@@ -60,7 +59,7 @@ public class SwerveModule
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANcoder(ids.steerEncoderID);
         driveVelocityVoltage = new VelocityVoltage(0);
-        steerPositionVoltage = new PositionDutyCycle(0);
+        steerPositionDutyCycle = new PositionDutyCycle(0);
         setUpMotors();
     }
 
@@ -99,7 +98,8 @@ public class SwerveModule
     public double getSteeringAngle()
     {
         // TODO:Check 
-        return (steerEncoder.getPosition().getValue() * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        return (steerEncoder.getAbsolutePosition().getValue() * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        
     }
 
     // Return drive encoder in meters.
@@ -191,7 +191,7 @@ public class SwerveModule
         //TODO: fix steering angle units and add offset
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
-        steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
+        steerMotor.setControl(steerPositionDutyCycle.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
         SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
@@ -253,6 +253,7 @@ public class SwerveModule
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         // }
         
+        //steerMotor.setPosition(0);
         error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackRemoteSensorID(idcfg.steerEncoderID));
         if(error != StatusCode.OK)
         {
