@@ -19,11 +19,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSubsystem extends SubsystemBase 
+public class DriveSubsystem extends Diagnostics 
 {
   private SwerveDriveKinematics kinematics;
   private SwerveDriveOdometry odometry;
@@ -131,6 +132,22 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.ModulePositions", 0.5017);
   }
 
+  @Override
+  public void initSendable(SendableBuilder builder){
+    builder.setSmartDashboardType("DriveSubsystem");
+    builder.addDoubleProperty("Actual Module 1 speed", modules[1]::getDriveVelocity, null);
+    builder.addDoubleProperty("Actual Module 1 angle", modules[1]::getSteeringAngle, null);
+
+    builder.addDoubleProperty("Odometry x", odometry.getPoseMeters()::getX, null);
+    builder.addDoubleProperty("Odometry y", odometry.getPoseMeters()::getY, null);
+    builder.addDoubleProperty("Odometry Heading", this::getHeading, null);
+    builder.addDoubleProperty("Odometry wrapped Heading", this::getWrappedHeading, null);
+
+    builder.addDoubleProperty("Pitch", this::getPitch, null);
+    builder.addDoubleProperty("Roll", this::getRoll, null);
+    builder.addDoubleProperty("Pitch Rate", this::getPitchRate, null);
+  }
+
   public String getDiagnostics() 
   {
     String result = modules[0].getDiagnostics();
@@ -150,6 +167,15 @@ public class DriveSubsystem extends SubsystemBase
     
     //Check errors for all hardware
     return result;
+  }
+
+  @Override
+  public void runDiagnostics() {
+    String result = new String();
+    boolean isOK = true;
+    //TODO: run diagnostics here
+    super.setDiagnosticResult(result);
+    super.setOK(isOK);
   }
 
   public void setDebugMode(boolean debug) 
@@ -294,8 +320,8 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
 
-      SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
-      SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());
+      // SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
+      // SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());
       SmartDashboard.putNumber("Commanded Speed", states[0].speedMetersPerSecond);
       SmartDashboard.putNumber("Commanded angle", states[0].angle.getRadians());
     }
@@ -306,14 +332,14 @@ public class DriveSubsystem extends SubsystemBase
       setDebugDrivePower(SmartDashboard.getNumber("Debug Power", 0.0));
     }
     updateOdometry();
-    SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
-    SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
-    SmartDashboard.putNumber("Odometry.Wrapped.Heading", this.getWrappedHeading());
+    // SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
+    // SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
+    // SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
+    // SmartDashboard.putNumber("Odometry.Wrapped.Heading", this.getWrappedHeading());
 
-    SmartDashboard.putNumber("Pitch", getPitch());
-    SmartDashboard.putNumber("Roll", getRoll());
-    SmartDashboard.putNumber("Rate", getPitchRate());
+    // SmartDashboard.putNumber("Pitch", getPitch());
+    // SmartDashboard.putNumber("Roll", getRoll());
+    // SmartDashboard.putNumber("Rate", getPitchRate());
   }
 
 

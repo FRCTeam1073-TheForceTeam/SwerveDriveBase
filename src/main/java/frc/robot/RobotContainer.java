@@ -27,6 +27,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
+    SmartDashboard.putData(m_driveSubsystem);
    
     configureBindings();
     //

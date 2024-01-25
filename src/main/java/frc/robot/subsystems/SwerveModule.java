@@ -20,6 +20,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. 
@@ -33,7 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * ! ! ! ! ! NOTE ! ! ! ! ! ! !
 */
 
-public class SwerveModule 
+public class SwerveModule extends Diagnostics
 {
     private SwerveModuleConfig cfg;
     private SwerveModuleIDConfig idcfg;
@@ -43,6 +44,7 @@ public class SwerveModule
     public Translation2d position;
     public VelocityVoltage driveVelocityVoltage;
     public PositionDutyCycle steerPositionDutyCycle;
+    
     
     /** Constructs a swerve module class. Initializes drive and steer motors
      * 
@@ -61,6 +63,7 @@ public class SwerveModule
         driveVelocityVoltage = new VelocityVoltage(0);
         steerPositionDutyCycle = new PositionDutyCycle(0);
         setUpMotors();
+        
     }
 
     public static void initPreferences() 
@@ -86,7 +89,16 @@ public class SwerveModule
             result += String.format(" Module %d, steerEncoder %d, error.", cfg.moduleNumber, idcfg.steerEncoderID);
         }
         return result;
-      }
+    }
+
+    @Override
+    public void runDiagnostics() {
+        String result = new String();
+        boolean isOK = true;
+        //TODO: run diagnostics here
+        super.setDiagnosticResult(result);
+        super.setOK(isOK);
+    }
 
     // Populate a SwerveModulePosition object from the state of this module.
     public void updatePosition(SwerveModulePosition position){
