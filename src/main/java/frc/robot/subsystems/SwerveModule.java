@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -110,7 +111,7 @@ public class SwerveModule extends Diagnostics
     public double getSteeringAngle()
     {
         // TODO:Check 
-        return (steerEncoder.getAbsolutePosition().getValue() * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        return ((-steerEncoder.getPosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
         
     }
 
@@ -265,6 +266,10 @@ public class SwerveModule extends Diagnostics
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         // }
         
+        //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
+        steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
+        steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
+
         //steerMotor.setPosition(0);
         error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackRemoteSensorID(idcfg.steerEncoderID));
         if(error != StatusCode.OK)

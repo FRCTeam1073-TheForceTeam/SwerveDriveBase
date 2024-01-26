@@ -135,8 +135,8 @@ public class DriveSubsystem extends Diagnostics
   @Override
   public void initSendable(SendableBuilder builder){
     builder.setSmartDashboardType("DriveSubsystem");
-    builder.addDoubleProperty("Actual Module 1 speed", modules[1]::getDriveVelocity, null);
-    builder.addDoubleProperty("Actual Module 1 angle", modules[1]::getSteeringAngle, null);
+    // builder.addDoubleProperty("Actual Module 1 speed", modules[1]::getDriveVelocity, null);
+    // builder.addDoubleProperty("Actual Module 1 angle", modules[1]::getSteeringAngle, null);
 
     builder.addDoubleProperty("Odometry x", odometry.getPoseMeters()::getX, null);
     builder.addDoubleProperty("Odometry y", odometry.getPoseMeters()::getY, null);
@@ -322,8 +322,8 @@ public class DriveSubsystem extends Diagnostics
 
       // SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
       // SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());
-      SmartDashboard.putNumber("Commanded Speed", states[0].speedMetersPerSecond);
-      SmartDashboard.putNumber("Commanded angle", states[0].angle.getRadians());
+      // SmartDashboard.putNumber("Commanded Speed", states[1].speedMetersPerSecond);
+      // SmartDashboard.putNumber("Commanded angle", states[1].angle.getRadians());
     }
     if(debug)
     { //in debug mode
