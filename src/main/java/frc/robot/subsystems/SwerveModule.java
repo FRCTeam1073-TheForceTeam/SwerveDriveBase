@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Add your docs here. 
  * 
  * ! ! ! ! ! NOTE ! ! ! ! ! ! !
- * 
+ *  
  * THIS CODE ONLY WORKS IF YOU SET THE CANCODERS TO BOOT TO ABSOLUTE POSITION
  * 
  * OTHERWISE THE WHEELS WILL NOT INITIALIZE IN THE CORRECT POSITIONS
@@ -260,7 +260,7 @@ public class SwerveModule extends Diagnostics
         driveMotor.getConfigurator().apply(new CurrentLimitsConfigs().withSupplyTimeThreshold(cfg.driveCurrentThresholdTime));
 
         //Set up talon for CAN encoder
-        //error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
+        // error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
         // if(error != StatusCode.OK)
         // {
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
@@ -269,8 +269,9 @@ public class SwerveModule extends Diagnostics
         //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
         steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
         steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
-
+        
         //steerMotor.setPosition(0);
+        steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
         error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackRemoteSensorID(idcfg.steerEncoderID));
         if(error != StatusCode.OK)
         {
@@ -284,10 +285,10 @@ public class SwerveModule extends Diagnostics
         // PID Loop settings for steering position control:
         var steerMotorClosedLoopConfig = new Slot0Configs();
 
-        steerMotorClosedLoopConfig.withKP(cfg.steerP);
-        steerMotorClosedLoopConfig.withKI(cfg.steerI);
-        steerMotorClosedLoopConfig.withKD(cfg.steerD);
-        steerMotorClosedLoopConfig.withKV(cfg.steerF);
+        steerMotorClosedLoopConfig.withKP(cfg.steerP); 
+        steerMotorClosedLoopConfig.withKI(cfg.steerI); 
+        steerMotorClosedLoopConfig.withKD(cfg.steerD); 
+        steerMotorClosedLoopConfig.withKV(cfg.steerF); 
         
         steerMotor.getConfigurator().apply(steerMotorClosedLoopConfig, 0.05);
 
