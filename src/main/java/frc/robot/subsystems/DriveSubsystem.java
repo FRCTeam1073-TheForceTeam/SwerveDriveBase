@@ -315,10 +315,10 @@ public class DriveSubsystem extends Diagnostics
       states[2] = optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
       states[3] = optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
 
-      // modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
-      // modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
-      // modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
-      // modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+      modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
+      modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
+      modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
+      modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
 
       // SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
       // SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());

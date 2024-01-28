@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -111,8 +112,8 @@ public class SwerveModule extends Diagnostics
     public double getSteeringAngle()
     {
         // TODO:Check 
-        return ((-steerEncoder.getPosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
-        
+        return ((steerEncoder.getAbsolutePosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        //return (steerMotor.getPosition().getValue() / cfg.radiansPerRotation) - cfg.steerAngleOffset;
     }
 
     // Return drive encoder in meters.
@@ -226,6 +227,10 @@ public class SwerveModule extends Diagnostics
     // configures motors with PIDF values, if it is inverted or not, current limits
     public void setUpMotors()
     {
+
+        TalonFXConfiguration steerConfigs = new TalonFXConfiguration();
+        TalonFXConfiguration driveConfigs = new TalonFXConfiguration();
+
         var error = steerMotor.getConfigurator().apply(new TalonFXConfiguration());
 
         if (error != StatusCode.OK) {
@@ -267,19 +272,25 @@ public class SwerveModule extends Diagnostics
         // }
         
         //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
+        //steerEncoder.getConfigurator().apply(new CANcoderConfiguration())
         steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
         steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
         
         //steerMotor.setPosition(0);
-        steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
-        error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackRemoteSensorID(idcfg.steerEncoderID));
+        steerConfigs.Feedback.FeedbackRemoteSensorID = idcfg.steerEncoderID;
+        steerConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        //steerConfigs.Feedback.RotorToSensorRatio = 1 / cfg.radiansPerRotation;
+        //steerConfigs.ClosedLoopGeneral.ContinuousWrap = true;
+        //steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
+        error = steerMotor.getConfigurator().apply(steerConfigs);
         if(error != StatusCode.OK)
         {
             System.out.println(String.format("Module %d configSelectedFeedbackSensor failed: %s ", cfg.moduleNumber, error));
         }
 
         //driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-        driveMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor));
+        driveConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        driveMotor.getConfigurator().apply(driveConfigs);
         driveMotor.setPosition(0);
     
         // PID Loop settings for steering position control:
