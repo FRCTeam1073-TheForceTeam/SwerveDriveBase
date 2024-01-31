@@ -310,15 +310,32 @@ public class DriveSubsystem extends Diagnostics
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
-      states[0] = optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+
+      SmartDashboard.putNumber("Module 0 unoptimized", states[0].angle.getRotations());
+      SmartDashboard.putNumber("Module 1 unoptimized", states[1].angle.getRotations());
+      SmartDashboard.putNumber("Module 2 unoptimized", states[2].angle.getRotations());
+      SmartDashboard.putNumber("Module 3 unoptimized", states[3].angle.getRotations());
+
+      // states[0] = optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
+      // states[1] = optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
+      // states[2] = optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
+      // states[3] = optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+
+      // SmartDashboard.putNumber("Module 0 optimized", states[0].angle.getRadians());
+      // SmartDashboard.putNumber("Module 1 optimized", states[1].angle.getRadians());
+      // SmartDashboard.putNumber("Module 2 optimized", states[2].angle.getRadians());
+      // SmartDashboard.putNumber("Module 3 optimized", states[3].angle.getRadians());
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+
+      // modules[0].setCommand(states[0].angle.getRotations(), states[0].speedMetersPerSecond);
+      // modules[1].setCommand(states[1].angle.getRotations(), states[1].speedMetersPerSecond);
+      // modules[2].setCommand(states[2].angle.getRotations(), states[2].speedMetersPerSecond);
+      // modules[3].setCommand(states[3].angle.getRotations(), states[3].speedMetersPerSecond);
+
 
       // SmartDashboard.putNumber("Actual Module 1 speed", modules[1].getDriveVelocity());
       // SmartDashboard.putNumber("Actual Module 1 angle", modules[1].getSteeringAngle());

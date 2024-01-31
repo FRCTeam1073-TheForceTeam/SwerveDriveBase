@@ -112,8 +112,13 @@ public class SwerveModule extends Diagnostics
     public double getSteeringAngle()
     {
         // TODO:Check 
-        return ((steerEncoder.getAbsolutePosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        return ((steerEncoder.getPosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
         //return (steerMotor.getPosition().getValue() / cfg.radiansPerRotation) - cfg.steerAngleOffset;
+        //return steerEncoder.getPosition().getValue();
+    }
+
+    public double getMotorAngle(){
+        return steerMotor.getRotorPosition().getValue() / cfg.radiansPerRotation;
     }
 
     // Return drive encoder in meters.
@@ -140,6 +145,7 @@ public class SwerveModule extends Diagnostics
         SmartDashboard.putNumber(String.format(" Steer Angle %d", cfg.moduleNumber), steeringAngle);
         SmartDashboard.putNumber(String.format(" Drive Velocity %d", cfg.moduleNumber), driveVelocity);
         SmartDashboard.putNumber(String.format(" Encoder Angle %d", cfg.moduleNumber), getSteeringAngle());
+        SmartDashboard.putNumber(String.format(" Motor Angle %d", cfg.moduleNumber), getMotorAngle());
 
         // steeringAngle %= (2.0 * Math.PI);
         // if (steeringAngle < -Math.PI) 
@@ -206,6 +212,7 @@ public class SwerveModule extends Diagnostics
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
         steerMotor.setControl(steerPositionDutyCycle.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
+        //steerMotor.setControl(steerPositionDutyCycle.withPosition( ste))
         SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
@@ -279,10 +286,11 @@ public class SwerveModule extends Diagnostics
         //steerMotor.setPosition(0);
         steerConfigs.Feedback.FeedbackRemoteSensorID = idcfg.steerEncoderID;
         steerConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        //steerConfigs.Feedback.RotorToSensorRatio = 1 / cfg.radiansPerRotation;
+        steerConfigs.Feedback.RotorToSensorRatio = 1 / (150.0 / 7.0);
         //steerConfigs.ClosedLoopGeneral.ContinuousWrap = true;
         //steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
         error = steerMotor.getConfigurator().apply(steerConfigs);
+        //steerMotor.setPosition(0.0);
         if(error != StatusCode.OK)
         {
             System.out.println(String.format("Module %d configSelectedFeedbackSensor failed: %s ", cfg.moduleNumber, error));
