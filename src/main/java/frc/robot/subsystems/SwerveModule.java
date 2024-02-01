@@ -45,7 +45,7 @@ public class SwerveModule extends Diagnostics
     private CANcoder steerEncoder;
     public Translation2d position;
     public VelocityVoltage driveVelocityVoltage;
-    public PositionDutyCycle steerPositionDutyCycle;
+    public PositionVoltage steerPositionVoltage;
     
     
     /** Constructs a swerve module class. Initializes drive and steer motors
@@ -63,7 +63,7 @@ public class SwerveModule extends Diagnostics
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANcoder(ids.steerEncoderID);
         driveVelocityVoltage = new VelocityVoltage(0);
-        steerPositionDutyCycle = new PositionDutyCycle(0);
+        steerPositionVoltage = new PositionVoltage(0).withSlot(0);
         setUpMotors();
         
     }
@@ -118,7 +118,7 @@ public class SwerveModule extends Diagnostics
     }
 
     public double getMotorAngle(){
-        return steerMotor.getRotorPosition().getValue() / cfg.radiansPerRotation;
+        return steerMotor.getPosition().getValue() * (2 * Math.PI);
     }
 
     // Return drive encoder in meters.
@@ -211,9 +211,11 @@ public class SwerveModule extends Diagnostics
         //TODO: fix steering angle units and add offset
         // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
-        steerMotor.setControl(steerPositionDutyCycle.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
+        //steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
+        //steerMotor.setControl(steerPositionDutyCycle.withPosition((steeringAngle +  cfg.steerAngleOffset)));
         //steerMotor.setControl(steerPositionDutyCycle.withPosition( ste))
-        SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
+        steerMotor.setControl(steerPositionVoltage.withPosition(1));
+        //SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
     /**Sets motors in the module to brake or coast mode
@@ -278,7 +280,7 @@ public class SwerveModule extends Diagnostics
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         // }
         
-        //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
+        steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
         //steerEncoder.getConfigurator().apply(new CANcoderConfiguration())
         steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
         steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
@@ -286,7 +288,8 @@ public class SwerveModule extends Diagnostics
         //steerMotor.setPosition(0);
         steerConfigs.Feedback.FeedbackRemoteSensorID = idcfg.steerEncoderID;
         steerConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        steerConfigs.Feedback.RotorToSensorRatio = 1 / (150.0 / 7.0);
+        steerConfigs.Feedback.RotorToSensorRatio = (150.0 / 7.0);
+        steerConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         //steerConfigs.ClosedLoopGeneral.ContinuousWrap = true;
         //steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
         error = steerMotor.getConfigurator().apply(steerConfigs);
