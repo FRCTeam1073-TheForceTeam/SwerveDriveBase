@@ -74,7 +74,8 @@ public class SwerveModule extends Diagnostics
     }
 
     //Returns diagnostics
-    public String getDiagnostics() {
+    public String getDiagnostics() 
+    {
         StatusCode error;
         String result = new String();
         // Fault faults = new Faults();
@@ -87,14 +88,16 @@ public class SwerveModule extends Diagnostics
         //     result += faults.toString();
         // }
         error = steerEncoder.clearStickyFaults(500);
-        if (error != StatusCode.OK) {
+        if (error != StatusCode.OK) 
+        {
             result += String.format(" Module %d, steerEncoder %d, error.", cfg.moduleNumber, idcfg.steerEncoderID);
         }
         return result;
     }
 
     @Override
-    public void runDiagnostics() {
+    public void runDiagnostics() 
+    {
         String result = new String();
         boolean isOK = true;
         //TODO: run diagnostics here
@@ -103,22 +106,25 @@ public class SwerveModule extends Diagnostics
     }
 
     // Populate a SwerveModulePosition object from the state of this module.
-    public void updatePosition(SwerveModulePosition position){
-        position.angle = Rotation2d.fromRadians(getSteeringAngle());
+    public void updatePosition(SwerveModulePosition position)
+    {
+        position.angle = Rotation2d.fromRotations(getSteerRotations());
         position.distanceMeters = getDriveEncoder();
     }
 
-    // Return steering sensor angle in radians. 0 = dead ahead on robot.
-    public double getSteeringAngle()
+    // Return steering sensor angle in rotations. 0 = dead ahead on robot.
+    public double getSteerRotations()
     {
         // TODO:Check 
-        return ((steerEncoder.getPosition().getValue()) * (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        steerEncoder.getAbsolutePosition().refresh();
+        return ((steerEncoder.getAbsolutePosition().getValue()));
         //return (steerMotor.getPosition().getValue() / cfg.radiansPerRotation) - cfg.steerAngleOffset;
         //return steerEncoder.getPosition().getValue();
     }
 
-    public double getMotorAngle(){
-        return steerMotor.getPosition().getValue() * (2 * Math.PI);
+    public double getMotorAngle()
+    {
+        return steerMotor.getPosition().getValue();
     }
 
     // Return drive encoder in meters.
@@ -129,63 +135,30 @@ public class SwerveModule extends Diagnostics
     }
 
     // Return drive velocity in meters/second.
-    public double getDriveVelocity(){ 
+    public double getDriveVelocity()
+    { 
         // TODO: Find out meters per second
         // TODO:Check ^^
-        return -driveMotor.getRotorVelocity().getValue() / (cfg.metersPerRotation );
+        return -driveMotor.getRotorVelocity().getValue() / (cfg.metersPerRotation);
     }
 
     // Returns the velocity from the motor itself in rotations
-    public double getDriveRawVelocity() { // TODO: Same thing
+    public double getDriveRawVelocity() 
+    { // TODO: Same thing
         return driveMotor.getRotorVelocity().getValue();
     }
     
     //*Wrapping code from sds example swerve library
-    public void setCommand(double steeringAngle, double driveVelocity){
-        SmartDashboard.putNumber(String.format(" Steer Angle %d", cfg.moduleNumber), steeringAngle);
-        SmartDashboard.putNumber(String.format(" Drive Velocity %d", cfg.moduleNumber), driveVelocity);
-        SmartDashboard.putNumber(String.format(" Encoder Angle %d", cfg.moduleNumber), getSteeringAngle());
-        SmartDashboard.putNumber(String.format(" Motor Angle %d", cfg.moduleNumber), getMotorAngle());
-
-        // steeringAngle %= (2.0 * Math.PI);
-        // if (steeringAngle < -Math.PI) 
-        // {
-        //     steeringAngle += Math.PI;
-        // }
-        // if (steeringAngle > Math.PI)
-        // {
-        //     steeringAngle -= Math.PI;
-        // }
-
-        // double difference = steeringAngle - getSteeringAngle();
-        // Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
-        // if (difference >= Math.PI) {
-        //     steeringAngle -= 2.0 * Math.PI;
-        // } else if (difference < -Math.PI) {
-        //     steeringAngle += 2.0 * Math.PI;
-        // }
-        // difference = steeringAngle - getSteeringAngle(); // Recalculate difference
+    public void setCommand(double steerRotations, double driveVelocity){
+        SmartDashboard.putNumber(String.format(" Target Steer Rotations %d", cfg.moduleNumber), steerRotations);
+        SmartDashboard.putNumber(String.format(" Target Drive Velocity %d", cfg.moduleNumber), driveVelocity);
+        SmartDashboard.putNumber(String.format(" Steer Rotations %d", cfg.moduleNumber), getSteerRotations());
 
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
         //SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
 
-
-        // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
-        // movement of the module is less than 90 deg
-        /*if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
-            // Only need to add 180 deg here because the target angle will be put back into the range [0, 2pi)
-            steeringAngle += Math.PI;
-            driveVelocity *= -1.0;
-        }*/
-
-        // Put the target angle back into the range [0, 2pi)
-        // steeringAngle %= (2.0 * Math.PI);
-        // if (steeringAngle < 0.0) {
-        //     steeringAngle += 2.0 * Math.PI;
-        // }
-
         setDriveVelocity(driveVelocity);
-        setSteerAngle(steeringAngle);
+        setSteerRotations(steerRotations);
         // SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
         // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
@@ -206,7 +179,7 @@ public class SwerveModule extends Diagnostics
     }
 
     //setSteerAngle in radians
-    public void setSteerAngle(double steeringAngle)
+    public void setSteerRotations(double steerRotations)
     {
         //TODO: fix steering angle units and add offset
         // TODO:Check ^^
@@ -214,7 +187,7 @@ public class SwerveModule extends Diagnostics
         //steerMotor.setControl(steerPositionVoltage.withPosition((steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation));
         //steerMotor.setControl(steerPositionDutyCycle.withPosition((steeringAngle +  cfg.steerAngleOffset)));
         //steerMotor.setControl(steerPositionDutyCycle.withPosition( ste))
-        steerMotor.setControl(steerPositionVoltage.withPosition(1));
+        steerMotor.setControl(steerPositionVoltage.withPosition(steerRotations));
         //SmartDashboard.putNumber("Commanded Steer Angle", (steeringAngle +  cfg.steerAngleOffset) * cfg.radiansPerRotation);
     }
 
@@ -222,12 +195,15 @@ public class SwerveModule extends Diagnostics
      * 
      * @param brake a boolean to indicate if motors should be in brake mode or not
      */
-    public void setBrake(boolean brake){
-        if(brake){
+    public void setBrake(boolean brake)
+    {
+        if(brake)
+        {
             steerMotor.setNeutralMode(NeutralModeValue.Brake);
             driveMotor.setNeutralMode(NeutralModeValue.Brake);
         }
-        else{
+        else
+        {
             steerMotor.setNeutralMode(NeutralModeValue.Coast);
             driveMotor.setNeutralMode(NeutralModeValue.Coast);
         }
@@ -242,15 +218,19 @@ public class SwerveModule extends Diagnostics
 
         var error = steerMotor.getConfigurator().apply(new TalonFXConfiguration());
 
-        if (error != StatusCode.OK) {
+        if (error != StatusCode.OK) 
+        {
             System.out.print(String.format("Module %d STEER MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
         }
 
         error = driveMotor.getConfigurator().apply(new TalonFXConfiguration());
 
-        if (error != StatusCode.OK) {
+        if (error != StatusCode.OK) 
+        {
             System.out.println(String.format("Module %d DRIVE MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
         }
+
+
 
         // Set control direction of motors:
         steerMotor.setInverted(true);
@@ -280,10 +260,22 @@ public class SwerveModule extends Diagnostics
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         // }
         
-        steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
+        MagnetSensorConfigs mgSenseCfg = new MagnetSensorConfigs();
+        mgSenseCfg.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        mgSenseCfg.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        mgSenseCfg.MagnetOffset = cfg.steerRotationOffset; 
+
+
+        StatusCode response = steerEncoder.getConfigurator().apply(mgSenseCfg);
+        if (!response.isOK())
+        {
+            System.out.println("TalonFX ID " + steerEncoder.getDeviceID() + " failed config with error " + response.toString());
+        }
+        //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
         //steerEncoder.getConfigurator().apply(new CANcoderConfiguration())
-        steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
-        steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
+        //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
+        
+        // steerEncoder.getConfigurator().setPosition(steerEncoder.getAbsolutePosition().getValue());
         
         //steerMotor.setPosition(0);
         steerConfigs.Feedback.FeedbackRemoteSensorID = idcfg.steerEncoderID;

@@ -17,7 +17,7 @@ public class SwerveModuleConfig
     public double metersPerRotation = 6.75 / (0.1016 * Math.PI);
     public double radiansPerRotation = (150.0 / 7.0) / (Math.PI * 2);
     //public double tickPerRadian = 1000;
-    public double steerAngleOffset = 0;
+    public double steerRotationOffset = 0;
     public double steerCurrentLimit = 20;
     public double driveCurrentLimit = 35;
     public double steerCurrentThreshold = 12;

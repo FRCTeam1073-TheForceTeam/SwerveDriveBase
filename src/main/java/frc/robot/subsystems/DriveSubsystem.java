@@ -59,7 +59,7 @@ public class DriveSubsystem extends Diagnostics
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 0;
     moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module0.SteerAngleOffset", 2.879); //2.879;
+    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module0.SteerRotationsOffset", 0); //0.0579;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[0] = new SwerveModulePosition();
@@ -71,7 +71,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 1;
     moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module1.SteerAngleOffset", 1.866); // 1.866;
+    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module1.SteerRotationOffset", 0); // 0.2141;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[1] = new SwerveModulePosition();
@@ -83,7 +83,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 2;
     moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module2.SteerAngleOffset", 2.422); // 2.422;
+    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module2.SteerRotationOffset", 0); // -0.2897
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[2] = new SwerveModulePosition();
@@ -94,7 +94,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 3;
     moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module3.SteerAngleOffset", 1.109); //1.109;
+    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module3.SteerRotationOffset", 0); // -0.1635
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[3] = new SwerveModulePosition();
@@ -124,10 +124,10 @@ public class DriveSubsystem extends Diagnostics
   // Initialize preferences for this class:
   public static void initPreferences() 
   {
-    Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879); // Radians.
-    Preferences.initDouble("Drive.Module1.SteerAngleOffset", 1.866);
-    Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
-    Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
+    // Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879); // Radians.
+    // Preferences.initDouble("Drive.Module1.SteerAngleOffset", 1.866);
+    // Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
+    // Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
     Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
     Preferences.initDouble("Drive.ModulePositions", 0.5017);
   }
@@ -250,10 +250,10 @@ public class DriveSubsystem extends Diagnostics
     wheelStates[2].speedMetersPerSecond = modules[2].getDriveVelocity();
     wheelStates[3].speedMetersPerSecond = modules[3].getDriveVelocity();
 
-    wheelStates[0].angle = new Rotation2d(modules[0].getSteeringAngle());
-    wheelStates[1].angle = new Rotation2d(modules[1].getSteeringAngle());
-    wheelStates[2].angle = new Rotation2d(modules[2].getSteeringAngle());
-    wheelStates[3].angle = new Rotation2d(modules[3].getSteeringAngle());
+    wheelStates[0].angle = Rotation2d.fromRotations(modules[0].getSteerRotations());
+    wheelStates[1].angle = Rotation2d.fromRotations(modules[1].getSteerRotations());
+    wheelStates[2].angle = Rotation2d.fromRotations(modules[2].getSteerRotations());
+    wheelStates[3].angle = Rotation2d.fromRotations(modules[3].getSteerRotations());
 
     return kinematics.toChassisSpeeds(wheelStates);
   }
@@ -311,10 +311,10 @@ public class DriveSubsystem extends Diagnostics
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
 
-      SmartDashboard.putNumber("Module 0 unoptimized", states[0].angle.getRotations());
-      SmartDashboard.putNumber("Module 1 unoptimized", states[1].angle.getRotations());
-      SmartDashboard.putNumber("Module 2 unoptimized", states[2].angle.getRotations());
-      SmartDashboard.putNumber("Module 3 unoptimized", states[3].angle.getRotations());
+      SmartDashboard.putNumber("Module 0 unoptimized", states[0].angle.getRotations()); 
+      SmartDashboard.putNumber("Module 1 unoptimized", states[1].angle.getRotations()); 
+      SmartDashboard.putNumber("Module 2 unoptimized", states[2].angle.getRotations()); 
+      SmartDashboard.putNumber("Module 3 unoptimized", states[3].angle.getRotations()); 
 
       // states[0] = optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
       // states[1] = optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
@@ -326,10 +326,10 @@ public class DriveSubsystem extends Diagnostics
       // SmartDashboard.putNumber("Module 2 optimized", states[2].angle.getRadians());
       // SmartDashboard.putNumber("Module 3 optimized", states[3].angle.getRadians());
 
-      modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
-      modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
-      modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
-      modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+      modules[0].setCommand(states[0].angle.getRotations(), states[0].speedMetersPerSecond);
+      modules[1].setCommand(states[1].angle.getRotations(), states[1].speedMetersPerSecond);
+      modules[2].setCommand(states[2].angle.getRotations(), states[2].speedMetersPerSecond);
+      modules[3].setCommand(states[3].angle.getRotations(), states[3].speedMetersPerSecond);
 
       // modules[0].setCommand(states[0].angle.getRotations(), states[0].speedMetersPerSecond);
       // modules[1].setCommand(states[1].angle.getRotations(), states[1].speedMetersPerSecond);
@@ -367,15 +367,15 @@ public class DriveSubsystem extends Diagnostics
     if (parkingBrakeOn)
     {
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
-      states[0] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[3].getSteeringAngle()));
+      states[0] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), Rotation2d.fromRotations(modules[0].getSteerRotations()));
+      states[1] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), Rotation2d.fromRotations(modules[1].getSteerRotations()));
+      states[2] = optimize(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), Rotation2d.fromRotations(modules[2].getSteerRotations()));
+      states[3] = optimize(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), Rotation2d.fromRotations(modules[3].getSteerRotations()));
 
-      modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
-      modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
-      modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
-      modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+      modules[0].setCommand(states[0].angle.getRotations(), states[0].speedMetersPerSecond);
+      modules[1].setCommand(states[1].angle.getRotations(), states[1].speedMetersPerSecond);
+      modules[2].setCommand(states[2].angle.getRotations(), states[2].speedMetersPerSecond);
+      modules[3].setCommand(states[3].angle.getRotations(), states[3].speedMetersPerSecond);
     }
   }
 
