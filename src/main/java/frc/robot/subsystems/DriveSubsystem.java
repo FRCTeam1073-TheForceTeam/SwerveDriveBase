@@ -186,7 +186,7 @@ public class DriveSubsystem extends Diagnostics
   //Returns IMU heading in degrees
   public double getHeading() 
   {
-    return pigeon2.getAngle();
+    return -pigeon2.getAngle();
   }
 
   // Wraps the heading
@@ -224,7 +224,7 @@ public class DriveSubsystem extends Diagnostics
   public void zeroHeading() 
   {
     //TODO:Change value to whatever value you need it to be
-    pigeon2.setYaw(180);
+    pigeon2.setYaw(0);
   }
 
   // Set the commanded chassis speeds for the drive subsystem.
@@ -279,7 +279,6 @@ public class DriveSubsystem extends Diagnostics
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
-    double heading = getHeading();
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
@@ -316,10 +315,10 @@ public class DriveSubsystem extends Diagnostics
       SmartDashboard.putNumber("Module 2 unoptimized", states[2].angle.getRotations()); 
       SmartDashboard.putNumber("Module 3 unoptimized", states[3].angle.getRotations()); 
 
-      // states[0] = optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      // states[1] = optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      // states[2] = optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      // states[3] = optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+      states[0] = SwerveModuleState.optimize(states[0], Rotation2d.fromRotations(modules[0].getSteerRotations()));
+      states[1] = SwerveModuleState.optimize(states[1], Rotation2d.fromRotations(modules[1].getSteerRotations()));
+      states[2] = SwerveModuleState.optimize(states[2], Rotation2d.fromRotations(modules[2].getSteerRotations()));
+      states[3] = SwerveModuleState.optimize(states[3], Rotation2d.fromRotations(modules[3].getSteerRotations()));
 
       // SmartDashboard.putNumber("Module 0 optimized", states[0].angle.getRadians());
       // SmartDashboard.putNumber("Module 1 optimized", states[1].angle.getRadians());

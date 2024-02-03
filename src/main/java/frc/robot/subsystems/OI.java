@@ -111,7 +111,7 @@ public class OI extends SubsystemBase
     private final double RIGHT_X_MAX = 1;
     private double RIGHT_X_ZERO = 0;
     public double getDriverRightX() {
-        return MathUtil.clamp(2.0 * (driverController.getRawAxis(4) - (RIGHT_X_MAX + RIGHT_X_MIN) * 0.5) / (RIGHT_X_MAX - RIGHT_X_MIN) - RIGHT_X_ZERO, -1, 1);
+        return -MathUtil.clamp(2.0 * (driverController.getRawAxis(4) - (RIGHT_X_MAX + RIGHT_X_MIN) * 0.5) / (RIGHT_X_MAX - RIGHT_X_MIN) - RIGHT_X_ZERO, -1, 1);
     }
     private final double RIGHT_Y_MIN = -1;
     private final double RIGHT_Y_MAX = 1;

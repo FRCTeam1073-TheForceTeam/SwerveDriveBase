@@ -22,6 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -62,7 +63,7 @@ public class SwerveModule extends Diagnostics
         steerMotor = new TalonFX(ids.steerMotorID);
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANcoder(ids.steerEncoderID);
-        driveVelocityVoltage = new VelocityVoltage(0);
+        driveVelocityVoltage = new VelocityVoltage(0).withSlot(0);
         steerPositionVoltage = new PositionVoltage(0).withSlot(0);
         setUpMotors();
         
@@ -131,7 +132,7 @@ public class SwerveModule extends Diagnostics
     public double getDriveEncoder()
     {
         // TODO:Check 
-        return -driveMotor.getRotorPosition().getValue() * cfg.metersPerRotation;
+        return -driveMotor.getRotorPosition().getValue() * cfg.rotationsPerMeter;
     }
 
     // Return drive velocity in meters/second.
@@ -139,7 +140,7 @@ public class SwerveModule extends Diagnostics
     { 
         // TODO: Find out meters per second
         // TODO:Check ^^
-        return -driveMotor.getRotorVelocity().getValue() / (cfg.metersPerRotation);
+        return -driveMotor.getRotorVelocity().getValue() / (cfg.rotationsPerMeter);
     }
 
     // Returns the velocity from the motor itself in rotations
@@ -153,15 +154,32 @@ public class SwerveModule extends Diagnostics
         SmartDashboard.putNumber(String.format(" Target Steer Rotations %d", cfg.moduleNumber), steerRotations);
         SmartDashboard.putNumber(String.format(" Target Drive Velocity %d", cfg.moduleNumber), driveVelocity);
         SmartDashboard.putNumber(String.format(" Steer Rotations %d", cfg.moduleNumber), getSteerRotations());
+        SmartDashboard.putNumber(String.format("Drive Velocity %d", cfg.moduleNumber), getDriveVelocity());
 
-        // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
-        //SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
+        //double velocityToSet = optimized.speedMetersPerSecond * m_driveRotationsPerMeter;
+        // driveVelocity^
+
+        /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
+        /* To reduce the "skew" that occurs when changing direction */
+        double steerMotorError = steerRotations - getSteerRotations();
+        /* If error is close to 0 rotations, we're already there, so apply full power */
+        /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
+        double cosineScalar = Math.cos(Units.rotationsToRadians(steerMotorError));
+        /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
+        if (cosineScalar < 0.0) {
+            cosineScalar = 0.0;
+        }
+        driveVelocity *= cosineScalar;
+
+        // /* Back out the expected shimmy the drive motor will see */
+        // /* Find the angular rate to determine what to back out */
+        // double azimuthTurnRps = m_steerVelocity.getValue();
+        // /* Azimuth turn rate multiplied by coupling ratio provides back-out rps */
+        // double driveRateBackOut = azimuthTurnRps * m_couplingRatioDriveRotorToCANcoder;
+        // velocityToSet -= driveRateBackOut;
 
         setDriveVelocity(driveVelocity);
         setSteerRotations(steerRotations);
-        // SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
-        // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
-        // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
     }
 
     //Sets the velocity for the drive motors
@@ -173,8 +191,8 @@ public class SwerveModule extends Diagnostics
         //var error = driveMotor.setControl(new VelocityDutyCycle((-driveVelocity * cfg.metersPerRotation) / 10));
         // VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
         // var error = driveMotor.setControl(velocityDutyCycle.withVelocity((-driveVelocity * cfg.metersPerRotation) / 10));
-        driveMotor.setControl(driveVelocityVoltage.withVelocity((-driveVelocity * cfg.metersPerRotation)));
-        SmartDashboard.putNumber("commanded Drive velocity", (-driveVelocity * cfg.metersPerRotation));
+        driveMotor.setControl(driveVelocityVoltage.withVelocity((driveVelocity * cfg.rotationsPerMeter)));
+        SmartDashboard.putNumber("commanded Drive Rps", (driveVelocity * cfg.rotationsPerMeter));
         //System.out.println(error.getDescription());
     }
 
