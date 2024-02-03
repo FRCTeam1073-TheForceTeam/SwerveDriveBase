@@ -261,16 +261,20 @@ public class SwerveModule extends Diagnostics
         // }
         
         MagnetSensorConfigs mgSenseCfg = new MagnetSensorConfigs();
-        mgSenseCfg.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        mgSenseCfg.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        mgSenseCfg.MagnetOffset = cfg.steerRotationOffset; 
+        // mgSenseCfg.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        // mgSenseCfg.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        // mgSenseCfg.MagnetOffset = cfg.steerRotationOffset; 
 
-
-        StatusCode response = steerEncoder.getConfigurator().apply(mgSenseCfg);
-        if (!response.isOK())
-        {
-            System.out.println("TalonFX ID " + steerEncoder.getDeviceID() + " failed config with error " + response.toString());
-        }
+        StatusCode response = steerEncoder.getConfigurator().refresh(mgSenseCfg, 0.1);
+        System.out.println("steerEncoder response: " + response.getDescription());
+        System.out.println("Magnet AbsoluteSensorRange: " + mgSenseCfg.AbsoluteSensorRange);
+        System.out.println("Magnet SensorDirection: " + mgSenseCfg.SensorDirection);
+        System.out.println("Magnet MagnetOffset: " + mgSenseCfg.MagnetOffset);
+        // StatusCode response = steerEncoder.getConfigurator().apply(mgSenseCfg);
+        // if (!response.isOK())
+        // {
+        //     System.out.println("TalonFX ID " + steerEncoder.getDeviceID() + " failed config with error " + response.toString());
+        // }
         //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf));
         //steerEncoder.getConfigurator().apply(new CANcoderConfiguration())
         //steerEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));

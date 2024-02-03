@@ -46,7 +46,7 @@ public class DriveSubsystem extends Diagnostics
     {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
     }
-    error = pigeon2.setYaw(180);
+    error = pigeon2.setYaw(0);
 
     // Make space for four swerve modules:
     modules = new SwerveModule[4];
@@ -59,7 +59,7 @@ public class DriveSubsystem extends Diagnostics
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 0;
     moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module0.SteerRotationsOffset", 0); //0.0579;
+    //moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module0.SteerRotationsOffset", 0); //0.0579;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[0] = new SwerveModulePosition();
@@ -71,7 +71,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 1;
     moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module1.SteerRotationOffset", 0); // 0.2141;
+    //moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module1.SteerRotationOffset", 0); // 0.2141;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[1] = new SwerveModulePosition();
@@ -83,7 +83,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 2;
     moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module2.SteerRotationOffset", 0); // -0.2897
+    //moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module2.SteerRotationOffset", 0); // -0.2897
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[2] = new SwerveModulePosition();
@@ -94,7 +94,7 @@ public class DriveSubsystem extends Diagnostics
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 3;
     moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
-    moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module3.SteerRotationOffset", 0); // -0.1635
+    //moduleConfig.steerRotationOffset = Preferences.getDouble("Drive.Module3.SteerRotationOffset", 0); // -0.1635
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
     modulePositions[3] = new SwerveModulePosition();

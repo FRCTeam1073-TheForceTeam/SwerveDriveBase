@@ -144,6 +144,8 @@ public class TeleopDrive extends Command
       Pose2d zero = new Pose2d(0.0, 0.0, zeroRotate);
       m_driveSubsystem.resetOdometry(zero);
     }
+
+    SmartDashboard.putBoolean("Field Centric ", fieldCentric);
   }
 
   // public double snapToHeading(double currentAngle, double targetAngle, double joystickDesired){
