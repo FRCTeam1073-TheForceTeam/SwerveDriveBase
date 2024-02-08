@@ -42,16 +42,16 @@ public class RobotContainer {
     SwerveModule.initPreferences();
   }
 
-  public void diagnostics() {
+  // public void diagnostics() {
     
-    String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
-    String oiDiagnostics = m_OI.getDiagnostics();
+  //   String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
+  //   String oiDiagnostics = m_OI.getDiagnostics();
 
 
-    SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
-    SmartDashboard.putString("Diag/OI", oiDiagnostics);
+  //   SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
+  //   SmartDashboard.putString("Diag/OI", oiDiagnostics);
 
-  }
+  // }
 
   // called when robot initializes. Sets parking brake to false
   public void teleopInit() {

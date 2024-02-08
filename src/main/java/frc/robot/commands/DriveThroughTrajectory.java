@@ -139,7 +139,7 @@ public class DriveThroughTrajectory extends Command {
 
     speeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
 
-    drivetrain.setChassisSpeeds(speeds);
+    drivetrain.setTargetChassisSpeeds(speeds);
     if(currentTime < endTime){
       currentTime += 0.02;
     }
@@ -151,8 +151,8 @@ public class DriveThroughTrajectory extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    drivetrain.setChassisSpeeds(chassisSpeeds);
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees(drivetrain.getHeadingDegrees()));
+    drivetrain.setTargetChassisSpeeds(chassisSpeeds);
   }
 
   // Returns true when the command should end.

@@ -51,7 +51,7 @@ public class DriveTestCommand extends Command
   public void end(boolean interrupted) {
     System.out.println("DriveTestCommand ended.");
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0,0,0);
-    m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
+    m_driveSubsystem.setTargetChassisSpeeds(chassisSpeeds); 
     m_driveSubsystem.setDebugMode(false);
   }
 

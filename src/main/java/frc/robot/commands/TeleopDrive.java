@@ -24,7 +24,7 @@ public class TeleopDrive extends Command
   ChassisSpeeds chassisSpeeds;
   Pose2d targetRotation;
   Pose2d robotRotation;
-  DriveSubsystem m_driveSubsystem;
+  DriveSubsystem m_drivetrain;
   OI m_OI;
   private boolean fieldCentric;
   private boolean parked = false;
@@ -45,10 +45,10 @@ public class TeleopDrive extends Command
   public TeleopDrive(DriveSubsystem ds, OI oi)
   {
     super.setName("Teleop Drive");
-    m_driveSubsystem = ds;
+    m_drivetrain = ds;
     m_OI = oi;
     fieldCentric = true;
-    startAngle = ds.getHeading();
+    startAngle = ds.getHeadingDegrees();
     desiredAngle = startAngle;
     snapPidProfile = new PIDController(
       0.05, 
@@ -96,19 +96,20 @@ public class TeleopDrive extends Command
     }
     lastRobotCentricButton = m_OI.getFieldCentricToggle();
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
-    
+    SmartDashboard.putBoolean("Parking Brake", parked);
+
     if(m_OI.getLeftBumper() && lastParkingBreakButton == false)
     {
       parked = !parked;
     }
     lastParkingBreakButton = m_OI.getLeftBumper();
-    if(parked && !m_driveSubsystem.getParkingBrake())
+    if(parked && !m_drivetrain.getParkingBrake())
     {
-      m_driveSubsystem.parkingBrake(true);
+      m_drivetrain.parkingBrake(true);
     }
-    if(!parked && m_driveSubsystem.getParkingBrake())
+    if(!parked && m_drivetrain.getParkingBrake())
     {
-      m_driveSubsystem.parkingBrake(false);
+      m_drivetrain.parkingBrake(false);
     }
     else if (fieldCentric)
     {
@@ -121,8 +122,8 @@ public class TeleopDrive extends Command
         vx,
         vy,
         w,
-        Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
-        m_driveSubsystem.setChassisSpeeds(speeds);
+        Rotation2d.fromDegrees(m_drivetrain.getHeadingDegrees())); // get fused heading
+        m_drivetrain.setTargetChassisSpeeds(speeds);
     }
     else
     {
@@ -131,21 +132,19 @@ public class TeleopDrive extends Command
       speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
       speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25)* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
       speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25)* mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
-      m_driveSubsystem.setChassisSpeeds(speeds); 
+      m_drivetrain.setTargetChassisSpeeds(speeds); 
     }
     
     // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){
-      m_driveSubsystem.zeroHeading();
+      m_drivetrain.zeroHeading();
     }
 
     if(m_OI.getAButton()){
       Rotation2d zeroRotate = new Rotation2d();
       Pose2d zero = new Pose2d(0.0, 0.0, zeroRotate);
-      m_driveSubsystem.resetOdometry(zero);
+      m_drivetrain.resetOdometry(zero);
     }
-
-    SmartDashboard.putBoolean("Field Centric ", fieldCentric);
   }
 
   // public double snapToHeading(double currentAngle, double targetAngle, double joystickDesired){

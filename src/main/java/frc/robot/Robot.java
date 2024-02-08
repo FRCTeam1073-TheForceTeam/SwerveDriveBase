@@ -36,13 +36,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if(diagnosticCounter > 100){
-      m_robotContainer.diagnostics();
-      diagnosticCounter = 0;
-    }
-    else{
-      diagnosticCounter++;
-    }
+    // if(diagnosticCounter > 100){
+    //   m_robotContainer.diagnostics();
+    //   diagnosticCounter = 0;
+    // }
+    // else{
+    //   diagnosticCounter++;
+    // }
   }
 
   @Override

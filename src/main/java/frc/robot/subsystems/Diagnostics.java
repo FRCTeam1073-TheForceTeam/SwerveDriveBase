@@ -4,32 +4,31 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+/**
+ * Base class for supporting diagnostics functionality. You should derive your
+ * subsystems from DiagnosticsSubsystem and sub-components can derive from
+ * this class to make diagnostics easier.
+ */
+public interface Diagnostics {
+  
 
-public class Diagnostics extends SubsystemBase {
-  private boolean ok;
-  private String diagnosticResult;
-  /** Creates a new Diagnostics. */
-  public Diagnostics() {
-    ok = false;
-    diagnosticResult = "";
-  }
+  /**
+   * Derived classes @override this method to update your diagnostics results.
+   * Warning: You cannot expect to call this method from normal periodic code.
+   * It may take a very long time to run.
+   */
+  public boolean updateDiagnostics();
 
-  public void runDiagnostics(){}
+  /**
+   * Derived classes @override this method to update diagnostics feedback.
+   * @return
+   */
+  public boolean diagnosticsOk();
 
-  public boolean isOK(){
-    return ok;
-  }
+  /**
+   * Derived classes @override this method to provide diagnostics details
+   * @return
+   */
+  public String getDiagnosticsDetails();
 
-  public String getDiagnosticResult(){
-    return diagnosticResult;
-  }
-
-  public void setOK(boolean ok){
-    this.ok = ok;
-  }
-
-  public void setDiagnosticResult(String diagnosticResult){
-    this.diagnosticResult = diagnosticResult;
-  }
 }

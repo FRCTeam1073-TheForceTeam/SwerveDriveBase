@@ -77,8 +77,8 @@ public class DriveToPoint extends Command {
     //sets chassisSpeeds to the clamped velocity
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         xVelocity, yVelocity, angularVelocity,
-        Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
-    drivetrain.setChassisSpeeds(speeds);
+        Rotation2d.fromDegrees(drivetrain.getHeadingDegrees())); // get fused heading
+    drivetrain.setTargetChassisSpeeds(speeds);
     
   }
 
